@@ -2,7 +2,8 @@ import pandas as pd
 from datetime import datetime, timedelta
 from data_handler import StockDataHandler
 
-from technical_analysis import bolin_check2
+from technical_analysis import bolin_check2, bolin_check3
+from query_openai import check_gpt
 
 def rank_calculate(df):
     df['ROE_Rank'] = df['ROE'].rank(ascending=False, method='min')
@@ -48,17 +49,75 @@ def bollinger_techniques2(df):
             
             daily_df = data_handler.get_daily_data()
             if bolin_check2(daily_df):
-                print('wow:' + code)
-                result_list.append(code)  
+                print('wow:' + str(code))
+                result_list.append((str(code), str(name)))  
+                print(result_list)
         
         except Exception as e:    
             print("raise error ", e)
             count = count + 1
             
-    print(result_list)
-            
+    print(result_list) 
     return result_list
 
+def bollinger_techniques3(df):
+    count = 0
+    result_list = []  # 결과를 담을 리스트 선언
+    for code, name in zip(df['Code'], df['Name']) :
+        try:
+            if count > 500 :
+                return 
+            
+            count = count + 1
+            #print(code, count)
+            start, end = get_period()
+            formatted_number = str(code).zfill(6)
+            print(formatted_number)
+            data_handler = StockDataHandler(formatted_number, start, end)
+            if data_handler.check_valid_data() == False:
+                continue 
+            
+            daily_df = data_handler.get_daily_data()
+            if bolin_check3(daily_df):
+                print('wow:' + str(code))
+                result_list.append((str(code), str(name)))  
+                print(result_list)
+        
+        except Exception as e:    
+            print("raise error ", e)
+            count = count + 1
+            
+    print(result_list) 
+    return result_list
+
+def openai_techniques1(df):
+    count = 0
+    result_list = []  # 결과를 담을 리스트 선언
+    for code, name in zip(df['Code'], df['Name']) :
+        try:
+            if count > 250 :
+                break
+            
+            count = count + 1
+            #print(code, count)
+            start, end = get_period()
+            formatted_number = str(code).zfill(6)
+            print(formatted_number)
+            probability, message = check_gpt(formatted_number)
+
+            if probability > 60 :
+                print('wow probability:' + str(probability))
+                result_list.append({
+                    "code": str(code), 
+                    "name": str(name), 
+                    "probability": str(probability), 
+                    "message": message
+                }) 
+        except Exception as e:    
+            print("raise error ", e)
+            count = count + 1    
+    print(result_list) 
+    return result_list
 
 def get_last_total_df():
     current_date = datetime.now().strftime("%Y-%m-%d")

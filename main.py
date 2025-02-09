@@ -4,7 +4,7 @@ import fundametal_analysis
 from datetime import datetime, timedelta
 from data_handler import StockDataHandler
 import csv
-from rank_tickers import rank_calculate, bollinger_techniques2
+from rank_tickers import rank_calculate, bollinger_techniques2, bollinger_techniques3, openai_techniques1
 
 def get_tickers():
     #df_krx = stock.get_market_ticker_list('240818',market='ALL')
@@ -44,45 +44,45 @@ def save_list_to_csv(result_list, filename):
     # filename: 저장할 파일 이름
     with open(filename, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(['Code', 'Name'])  # CSV 파일의 헤더 추가
-        writer.writerows(result_list)      # 리스트의 각 튜플을 CSV로 저장
+        writer.writerow(['Code', 'Name', '확률'])  # CSV 파일의 헤더 추가
+        for item in result_list:
+            # Extract values from each dictionary item
+            code = item.get('code')
+            name = item.get('name')
+            probability = item.get('probability')
+            message = item.get('message')
+            writer.writerow([code, name, probability])
 
 def main():
-    # df_krx = get_tickers()
-    # start, end = get_period()
-    # total_df = pd.DataFrame(columns=['Code', 'Name', 'ROE', 'PM', 'EY'])
-    # print(len(df_krx))
-    # for code, name in zip(df_krx['Code'], df_krx['Name']) :
-    #     try:
-    #         print(code)
-    #         data_handler = StockDataHandler(code, start, end)
-    #         if data_handler.check_valid_data() == False:
-    #             continue 
-    #         daily_df = data_handler.get_daily_data()
-    #         roe, pm, ey = get_magic_symbols(code, daily_df['trade_price'].iloc[-1])
-    #         total_df = add_row(total_df, code, name, roe, pm, ey)
-    #     except Exception as e:    
-    #         print("raise error ", e)
+    df_krx = get_tickers()
+    start, end = get_period()
+    total_df = pd.DataFrame(columns=['Code', 'Name', 'ROE', 'PM', 'EY'])
+    print(len(df_krx))
+    for code, name in zip(df_krx['Code'], df_krx['Name']) :
+        try:
+            print(code)
+            data_handler = StockDataHandler(code, start, end)
+            if data_handler.check_valid_data() == False:
+                continue 
+            daily_df = data_handler.get_daily_data()
+            roe, pm, ey = get_magic_symbols(code, daily_df['trade_price'].iloc[-1])
+            total_df = add_row(total_df, code, name, roe, pm, ey)
+        except Exception as e:    
+            print("raise error ", e)
             
             
-    # df_sorted = rank_calculate(total_df)
-    # df_sorted.to_csv('df_sorted.csv', sep='\t', encoding='utf-8')
+    df_sorted = rank_calculate(total_df)
+    df_sorted.to_csv('df_sorted.csv', sep='\t', encoding='utf-8')
+    
+    #####################
     
     df_sorted = pd.read_csv('df_sorted.csv', sep='\t', encoding='utf-8')
     print(df_sorted)
-    result_list = bollinger_techniques2(df_sorted)
+    result_list = openai_techniques1(df_sorted)
+    print(result_list)
     
-    save_list_to_csv(result_list, 'bollinger_results.csv')
-
-    # from datetime import datetime
-
-    # # 현재 날짜 출력
-    # print('result ---- ')
-    # current_date = datetime.now().strftime("%Y-%m-%d")
-    # filename = "total_df_" + current_date+ ".csv"
-    # print(filename)
-    # total_df.to_csv(filename, sep='\t', encoding='utf-8')
-
+    save_list_to_csv(result_list, 'openai_results.csv')
+    
 if __name__ == "__main__":
     # execute only if run as a script
     main()

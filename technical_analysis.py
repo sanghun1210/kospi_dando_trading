@@ -48,6 +48,44 @@ def bolin_check2(df) :
         return True
     return False
 
+def bolin_check3(df):
+    df = calculate_bollinger_bands(df)
+
+    # 2. 첫번째 저점과 두번째 저점의 %b 조건을 찾아 필터링
+    # 첫번째 저점: %b < 0, 두번째 저점: %b > 0
+    first_low = df[df['%b'] < 0]
+    second_low = df[df['%b'] > 0]
+
+    # 최근 30일 데이터 추출 . 저점 발생 확인
+    recent_days = df.tail(30)
+
+    # 첫번째 저점: %b < 0 조건을 만족하는 지점 찾기
+    first_low_in_recent_days = recent_days[recent_days['%b'] < 0]
+    
+    if not first_low_in_recent_days.empty:
+        df['50_Volume_SMA'] = df['volume'].rolling(window=50).mean()
+        df['10_Range_SMA'] = (df['high_price'] - df['low_price']).rolling(window=10).mean()
+
+        # 최근 5일 안의 데이터만 추출
+        recent_5_days = df.tail(5)
+
+        # 조건에 맞는 날짜 필터링
+        results = []
+        for i, row in recent_5_days.iterrows():
+            # 조건: 주가 상승일, 거래량이 50일 평균보다 높음, 거래범위가 10일 평균보다 큼
+            if (row['trade_price'] > df['trade_price'].shift(1)[i] and
+                row['volume'] > row['50_Volume_SMA'] and
+                (row['high_price'] - row['low_price']) > row['10_Range_SMA']):
+                print('wow')
+                return 
+                
+
+        # # 조건을 만족하는 결과 출력
+        # filtered_data = df.loc[results]
+        # print(filtered_data)
+
+
+
 
 
     
