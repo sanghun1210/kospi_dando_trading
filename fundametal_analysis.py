@@ -78,7 +78,8 @@ class FundamentalAnalysis(object):
                 return None
             field_names = self.df[self.table_token]
             df = self.df.loc[field_names[self.table_token]==target_row]
-            #print(df)
+            # print(df)
+            
             data = df[target_cloumn]
 
             # 특정 열에서 추정치 제거
@@ -228,6 +229,11 @@ class FundamentalAnalysis(object):
         # print(shares)
 
         return roe_annual_lst[-1], eps_annaul_lst[-1]
+    
+    def get_base_financial_data_by_quater(self):
+        roe_annual_lst = self.get_data_lst_by("Net Quarter", "ROE")
+        eps_annaul_lst = self.get_data_lst_by("Net Quarter", "EPS  (원)")
+        return roe_annual_lst[-1], eps_annaul_lst[-1]
 
     #이익수익률
     #이익수익률 = 비율= 세전영업이익 (EBIT) / (주가 시가총액+순이자부담부채)
@@ -258,10 +264,10 @@ class FundamentalAnalysis(object):
         return ey
     
 def main():
-    test=FundamentalAnalysis("004985")
-    #print(test.estimate_basic_measure())
+    test=FundamentalAnalysis("154040")
+    print(test.get_base_financial_data())
 
-    print(test.get_earnings_yield(20000))
+    #print(test.get_earnings_yield(20000))
 
 if __name__ == "__main__":
     # execute only if run as a script

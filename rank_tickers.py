@@ -95,7 +95,7 @@ def openai_techniques1(df):
     result_list = []  # 결과를 담을 리스트 선언
     for code, name in zip(df['Code'], df['Name']) :
         try:
-            if count > 250 :
+            if count > 150 :
                 break
             
             count = count + 1
@@ -103,16 +103,19 @@ def openai_techniques1(df):
             start, end = get_period()
             formatted_number = str(code).zfill(6)
             print(formatted_number)
-            probability, message = check_gpt(formatted_number)
+            result, message = check_gpt(formatted_number)
+            short = result.get('short')
+            middle = result.get('middle')
+            signal = result.get('signal')
 
-            if probability > 60 :
-                print('wow probability:' + str(probability))
-                result_list.append({
-                    "code": str(code), 
-                    "name": str(name), 
-                    "probability": str(probability), 
-                    "message": message
-                }) 
+            result_list.append({
+                "code": str(code), 
+                "name": str(name), 
+                "short": str(short), 
+                "middle": str(middle), 
+                "signal": str(signal), 
+                "message": message
+            }) 
         except Exception as e:    
             print("raise error ", e)
             count = count + 1    

@@ -1,0 +1,553 @@
+
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; }
+                h1 { color: #2c3e50; }
+                h2 { color: #34495e; }
+                .stock {
+                    border: 1px solid #ddd;
+                    padding: 15px;
+                    margin: 10px 0;
+                    background-color: #f9f9f9;
+                    border-radius: 5px;
+                }
+                .score-high { background-color: #d4edda; }
+                .score-med { background-color: #fff3cd; }
+                .metric { margin: 5px 0; }
+                .pass { color: green; }
+                .fail { color: red; }
+            </style>
+        </head>
+        <body>
+            <h1>📊 F-Score 기반 주식 분석 리포트</h1>
+            <p><strong>날짜:</strong> 2025년 11월 01일</p>
+            <p><strong>분석 종목 수:</strong> 469개</p>
+
+            <h2>🎯 상위 20개 추천 종목</h2>
+        
+            <div class="stock score-high">
+                <h3>1. 티쓰리 (204610)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-0.73% → 10.28%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (17.18% → 15.25%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (14.9% → 17.71%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>2. 이엔에프테크놀로지 (102710)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (4.1% → 7.91%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (44.53% → 38.25%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (10.18% → 13.55%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>3. 씨에스베어링 (297090)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (1.69% → 5.8%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (36.62% → 35.03%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (1.99% → 9.22%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>4. 영원무역 (111770)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (5.46% → 5.61%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (27.72% → 27.21%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (8.97% → 10.31%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>5. 아나패스 (123860)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (2.41% → 16.07%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (51.92% → 38.18%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (6.29% → 10.98%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>6. 펨트론 (168360)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-2.65% → 2.93%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (60.81% → 60.4%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (-6.32% → 3.99%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>7. 자비스 (254120)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-8.7% → 3.05%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (40.22% → 26.72%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (2.79% → 3.19%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>8. 디와이피엔에프 (104460)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (1.96% → 5.67%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (61.55% → 60.04%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (5.76% → 8.75%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>9. 셀바이오휴먼텍 (318160)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-3.57% → 8.32%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (16.17% → 12.29%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (11.36% → 14.08%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>10. 현대오토에버 (307950)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (5.23% → 5.5%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (48.34% → 46.58%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (6.04% → 6.11%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>11. 주성코퍼레이션 (109070)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-4.11% → 12.57%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (34.9% → 26.78%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (-5.44% → 5.52%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>12. 케일럼 (258610)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-61.67% → 6.34%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (71.36% → 48.16%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (-5.21% → 3.29%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>13. 이마트 (139480)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-1.69% → 0.5%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (61.14% → 60.84%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (0.16% → 1.57%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>14. 아모센스 (357580)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-1.26% → 1.37%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (67.18% → 66.56%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (0.91% → 5.37%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>15. 가이아코퍼레이션 (296520)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-17.33% → 5.06%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (60.0% → 56.33%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (-7.3% → 4.15%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>16. 파인텍 (131760)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-10.95% → 3.38%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (56.47% → 54.62%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (-9.38% → 2.68%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>17. 지니틱스 (303030)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (-20.7% → 2.54%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (43.16% → 38.77%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (-18.13% → 0.55%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>18. 딜리 (131180)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (1.05% → 6.7%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (13.1% → 11.87%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (-3.5% → 6.02%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>19. 케이카 (381970)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (5.13% → 8.38%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (57.61% → 56.99%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (2.88% → 2.96%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-high">
+                <h3>20. 폰드그룹 (472850)</h3>
+                <p><strong>F-Score: 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                    (0.06% → 6.43%)
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                    (44.73% → 43.77%)
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                    (11.2% → 11.85%)
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+            </div>
+            
+            <hr>
+            <p><em>본 리포트는 자동으로 생성되었습니다. 투자 판단의 참고자료로만 활용하시기 바랍니다.</em></p>
+        </body>
+        </html>
+        
