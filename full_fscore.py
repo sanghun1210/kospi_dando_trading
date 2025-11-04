@@ -16,18 +16,25 @@ class FullFScoreCalculator:
     Lite F-Score (6개) + OpenDart (3개)
     """
 
-    def __init__(self, stock_code, opendart_api_key):
+    def __init__(self, stock_code, opendart_api_key=None, opendart_client=None):
         """
         Parameters:
         -----------
         stock_code : str
             6자리 종목 코드
         opendart_api_key : str
-            OpenDart API 인증키
+            OpenDart API 인증키 (opendart_client가 None일 때만 사용)
+        opendart_client : OpenDartClient
+            기존 OpenDartClient 인스턴스 (캐시 재사용)
         """
         self.stock_code = stock_code
         self.lite_calculator = LiteFScoreCalculator(stock_code)
-        self.dart_client = OpenDartClient(opendart_api_key)
+
+        # OpenDartClient 재사용 또는 새로 생성
+        if opendart_client is not None:
+            self.dart_client = opendart_client
+        else:
+            self.dart_client = OpenDartClient(opendart_api_key)
 
     def calculate(self, year=None):
         """

@@ -25,10 +25,11 @@
 
 ### 주요 특징
 
+- **완전한 F-Score**: Lite (6/9) + OpenDart (3/9) = **9/9 완벽 구현** ✨
 - **빠른 분석**: 병렬 처리로 2,600개 종목을 5분 내 처리
+- **Hybrid 시스템**: 효율적인 2단계 분석으로 시간 단축
 - **자동화**: 한 번 실행으로 전체 프로세스 완료
 - **검증된 전략**: 20년 이상 학술적으로 검증된 F-Score 활용
-- **확장 가능**: AWS Lambda 배포로 주간 자동 분석 가능
 
 ---
 
@@ -45,24 +46,45 @@ cd kospi_dando_trading
 pip install -r requirements.txt
 ```
 
-### 2. 실행
+### 2. OpenDart API 키 설정
 
 ```bash
-# 전체 종목 F-Score 계산 (약 4.5분 소요)
-python parallel_fscore.py
+# .env 파일에 API 키 추가 (선택사항)
+echo "OPENDART_API_KEY=your_api_key_here" > .env
 
-# 결과 상세 분석
-python analyze_results.py
+# 또는 코드에서 직접 설정
+# hybrid_fscore.py 파일의 api_key 변수 수정
 ```
 
-### 3. 결과 확인
+### 3. 실행
+
+#### Option A: Hybrid F-Score (권장) ⭐
+```bash
+# 2단계 효율적 분석: Lite 전체 → Full 상위 200개
+python hybrid_fscore.py
+```
+
+#### Option B: Lite F-Score (빠른 스캔)
+```bash
+# 전체 종목 Lite F-Score만 계산 (약 4.5분)
+python parallel_fscore.py
+```
+
+#### Option C: Full F-Score (정밀 분석)
+```bash
+# 특정 종목 Full F-Score 계산
+python full_fscore.py
+```
+
+### 4. 결과 확인
 
 ```bash
-# HTML 리포트 열기
-open fscore_parallel_report_20251101.html
+# Hybrid 결과
+open hybrid_full_results_YYYYMMDD.csv
+open full_fscore_report_YYYYMMDD.html
 
-# CSV 결과 확인
-open fscore_parallel_results_20251101.csv
+# Lite 결과
+open fscore_parallel_results_YYYYMMDD.csv
 ```
 
 ---
@@ -73,17 +95,22 @@ open fscore_parallel_results_20251101.csv
 kospi_dando_trading/
 │
 ├── 📄 핵심 모듈
-│   ├── parallel_fscore.py          # 병렬 처리 F-Score 계산 (메인)
-│   ├── lite_fscore.py              # F-Score 계산 로직
+│   ├── hybrid_fscore.py            # ⭐ Hybrid F-Score 시스템 (권장)
+│   ├── parallel_fscore_full.py     # Full F-Score 병렬 처리
+│   ├── full_fscore.py              # Full F-Score 계산기 (9/9)
+│   ├── parallel_fscore.py          # Lite F-Score 병렬 처리
+│   ├── lite_fscore.py              # Lite F-Score 계산 로직 (6/9)
+│   ├── opendart_client.py          # OpenDart API 클라이언트
 │   ├── stock_screener.py           # 종목 필터링
 │   ├── fundametal_analysis.py      # FnGuide 데이터 수집
 │   └── analyze_results.py          # 결과 분석 및 시각화
 │
 ├── 📊 결과 파일
-│   ├── fscore_parallel_results_20251101.csv      # 469개 종목 데이터
-│   ├── fscore_parallel_report_20251101.html      # 시각화 리포트
-│   ├── fscore_distribution.png                   # 점수 분포 그래프
-│   └── fscore_roa_change.png                     # ROA 증가율 Top 20
+│   ├── hybrid_full_results_*.csv               # Hybrid Full 결과
+│   ├── hybrid_lite_results_*.csv               # Hybrid Lite 결과
+│   ├── full_fscore_report_*.html               # Full F-Score 리포트
+│   ├── fscore_parallel_results_*.csv           # Lite F-Score 결과
+│   └── fscore_parallel_report_*.html           # Lite 시각화 리포트
 │
 ├── 📚 문서
 │   ├── README.md                   # 프로젝트 개요 (본 파일)
@@ -96,6 +123,7 @@ kospi_dando_trading/
 │
 └── 📝 기타
     ├── requirements.txt            # 필요 패키지
+    ├── debug_opendart.py           # OpenDart 디버깅 도구
     └── df_sorted.csv               # 종목 리스트 캐시
 ```
 
@@ -113,10 +141,11 @@ F-Score는 **재무제표 9가지 지표**를 체크하여 0~9점으로 기업�
 - 20년 이상 학술 연구로 효과 입증
 - 국내 시장에서도 유효성 확인
 
-### Lite F-Score (현재 버전)
+### Full F-Score (9/9) - 완성! 🎉
 
-FnGuide 데이터만으로 계산 가능한 **6가지 지표** 사용:
+**Lite F-Score (6개) + OpenDart (3개) = 9개 완벽 구현**
 
+#### Lite F-Score (FnGuide 데이터)
 1. ✅ 당기순이익 > 0
 2. ✅ ROA 증가
 3. ✅ 부채비율 감소
@@ -124,7 +153,10 @@ FnGuide 데이터만으로 계산 가능한 **6가지 지표** 사용:
 5. ✅ 영업이익률 증가
 6. ✅ 자산회전율 증가
 
-> OpenDart API 승인 후 Full F-Score (9/9) 업그레이드 예정
+#### OpenDart 추가 지표 (공식 데이터)
+7. ✅ 영업현금흐름 > 0
+8. ✅ 영업현금흐름 > 당기순이익 (회계 품질)
+9. ✅ 유동비율 증가
 
 ---
 
@@ -312,10 +344,12 @@ python analyze_results.py
 - [x] 결과 분석 및 시각화
 - [x] 투자 가이드 문서화
 
-### 🔄 Phase 2: 진행 중
-- [ ] OpenDart API 연동
-- [ ] Full F-Score (9/9 지표)
-- [ ] 백테스팅 시스템 완성
+### ✅ Phase 2: 완료 🎉
+- [x] OpenDart API 연동
+- [x] Full F-Score (9/9 지표) 완성
+- [x] Hybrid 2단계 분석 시스템
+- [x] 캐싱 및 성능 최적화
+- [ ] 백테스팅 시스템 완성 (진행 중)
 
 ### 📅 Phase 3: 예정
 - [ ] AWS Lambda 배포

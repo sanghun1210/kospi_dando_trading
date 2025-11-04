@@ -25,10 +25,44 @@ class OpenDartClient:
         """
         self.api_key = api_key
         self.base_url = "https://opendart.fss.or.kr/api"
+        self._corp_code_cache = None  # 캐시 추가
+
+    def _load_corp_code_cache(self):
+        """corp_code 전체 데이터를 한 번만 다운로드하여 캐싱"""
+        if self._corp_code_cache is not None:
+            return
+
+        try:
+            import zipfile
+            import io
+            import xml.etree.ElementTree as ET
+
+            url = f"{self.base_url}/corpCode.xml"
+            params = {'crtfc_key': self.api_key}
+
+            response = requests.get(url, params=params, timeout=30)
+
+            if response.status_code == 200:
+                # ZIP 파일 압축 해제
+                zip_file = zipfile.ZipFile(io.BytesIO(response.content))
+                xml_data = zip_file.read('CORPCODE.xml')
+
+                # XML 파싱하여 딕셔너리로 저장
+                root = ET.fromstring(xml_data)
+                self._corp_code_cache = {}
+
+                for company in root.findall('list'):
+                    stock_code = company.find('stock_code').text
+                    corp_code = company.find('corp_code').text
+                    if stock_code:  # 빈 값 체크
+                        self._corp_code_cache[stock_code] = corp_code
+        except Exception as e:
+            print(f"  ⚠️  corp_code 캐시 로드 실패: {e}")
+            self._corp_code_cache = {}
 
     def get_company_code(self, stock_code):
         """
-        종목 코드 → 고유번호(corp_code) 변환
+        종목 코드 → 고유번호(corp_code) 변환 (캐시 사용)
 
         Parameters:
         -----------
@@ -40,36 +74,12 @@ class OpenDartClient:
         corp_code : str
             8자리 고유번호 또는 None
         """
-        try:
-            url = f"{self.base_url}/corpCode.xml"
-            params = {'crtfc_key': self.api_key}
+        # 캐시가 없으면 로드
+        if self._corp_code_cache is None:
+            self._load_corp_code_cache()
 
-            response = requests.get(url, params=params, timeout=30)
-
-            if response.status_code == 200:
-                # XML에서 corp_code 찾기
-                import zipfile
-                import io
-                import xml.etree.ElementTree as ET
-
-                # ZIP 파일 압축 해제
-                zip_file = zipfile.ZipFile(io.BytesIO(response.content))
-                xml_data = zip_file.read('CORPCODE.xml')
-
-                # XML 파싱
-                root = ET.fromstring(xml_data)
-
-                for company in root.findall('list'):
-                    code = company.find('stock_code').text
-                    if code == stock_code:
-                        corp_code = company.find('corp_code').text
-                        return corp_code
-
-            return None
-
-        except Exception as e:
-            print(f"  ⚠️  고유번호 조회 실패: {e}")
-            return None
+        # 캐시에서 조회
+        return self._corp_code_cache.get(stock_code)
 
     def get_financial_statements(self, corp_code, year, report_code='11011', fs_div='CFS'):
         """

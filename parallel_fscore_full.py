@@ -38,6 +38,15 @@ class ParallelFullFScoreSelector:
         self.success_count = 0
         self.fail_count = 0
 
+        # OpenDartClient 공유 (캐시 재사용)
+        from opendart_client import OpenDartClient
+        self.dart_client = OpenDartClient(opendart_api_key)
+
+        # 미리 캐시 로드 (race condition 방지)
+        print("📥 OpenDart corp_code 캐시 로딩 중...")
+        self.dart_client._load_corp_code_cache()
+        print(f"✅ 캐시 로드 완료 ({len(self.dart_client._corp_code_cache)}개 기업)")
+
     def get_ticker_list(self):
         """종목 리스트 가져오기"""
         if self.use_existing_data:
@@ -69,8 +78,8 @@ class ParallelFullFScoreSelector:
         result : dict or None
         """
         try:
-            # Full F-Score 계산
-            calculator = FullFScoreCalculator(code, self.opendart_api_key)
+            # Full F-Score 계산 (공유된 dart_client 사용)
+            calculator = FullFScoreCalculator(code, opendart_client=self.dart_client)
             score, details = calculator.calculate('2023')
 
             if score is not None:
