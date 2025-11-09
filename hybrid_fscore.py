@@ -13,6 +13,7 @@ from datetime import datetime
 from parallel_fscore import ParallelFScoreSelector
 from parallel_fscore_full import ParallelFullFScoreSelector
 from sector_utils import DEFAULT_SECTOR, get_sector_lookup
+from opendart_client import OpenDartClient
 
 
 class HybridFScoreSystem:
@@ -26,8 +27,15 @@ class HybridFScoreSystem:
             OpenDart API 인증키
         """
         self.opendart_api_key = opendart_api_key
+        self.dart_client = OpenDartClient(opendart_api_key)
 
-    def run(self, top_n=200, final_min_score=7, lite_max_count=None):
+    def run(
+        self,
+        top_n=200,
+        final_min_score=7,
+        lite_max_count=None,
+        lite_workers=6,
+    ):
         """
         Hybrid 분석 실행
 
@@ -60,7 +68,8 @@ class HybridFScoreSystem:
 
         lite_selector = ParallelFScoreSelector(
             use_existing_data=True,
-            max_workers=8
+            max_workers=lite_workers,
+            opendart_client=self.dart_client,
         )
 
         # 종목 리스트 가져오기

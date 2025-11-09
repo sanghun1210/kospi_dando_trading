@@ -18,7 +18,7 @@ from threading import Lock
 class ParallelFScoreSelector:
     """병렬 처리 F-Score 계산기"""
 
-    def __init__(self, use_existing_data=False, max_workers=8):
+    def __init__(self, use_existing_data=False, max_workers=8, opendart_client=None):
         """
         Parameters:
         -----------
@@ -33,6 +33,7 @@ class ParallelFScoreSelector:
         self.max_workers = max_workers
         self.results = []
         self.lock = Lock()  # 스레드 안전성을 위한 락
+        self.opendart_client = opendart_client
 
         # 통계
         self.success_count = 0
@@ -44,6 +45,7 @@ class ParallelFScoreSelector:
             print("📂 기존 데이터 로드 중 (df_sorted.csv)...")
             try:
                 df = pd.read_csv('df_sorted.csv', sep='\t', encoding='utf-8')
+                df['Code'] = df['Code'].astype(str).str.zfill(6)
                 print(f"✅ {len(df)}개 종목 데이터 로드 완료")
                 return df[['Code', 'Name']].values.tolist()
             except Exception as e:
@@ -54,6 +56,7 @@ class ParallelFScoreSelector:
         # 새로 수집
         screener = StockScreener()
         df_filtered = screener.screen()
+        df_filtered['Code'] = df_filtered['Code'].astype(str).str.zfill(6)
         return df_filtered[['Code', 'Name']].values.tolist()
 
     def process_single_ticker(self, code, name, idx, total):
@@ -66,7 +69,7 @@ class ParallelFScoreSelector:
         """
         try:
             # F-Score 계산
-            calculator = LiteFScoreCalculator(code)
+            calculator = LiteFScoreCalculator(code, opendart_client=self.opendart_client)
             score, details = calculator.calculate()
 
             if score is not None:

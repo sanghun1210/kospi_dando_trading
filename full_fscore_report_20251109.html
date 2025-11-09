@@ -1,0 +1,954 @@
+
+        <html>
+        <head>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h1 { color: #2c3e50; }
+                h2 { color: #34495e; }
+                .summary {
+                    background-color: #ecf0f1;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin: 20px 0;
+                }
+                .stock {
+                    border: 1px solid #ddd;
+                    padding: 15px;
+                    margin: 10px 0;
+                    background-color: #f9f9f9;
+                    border-radius: 5px;
+                }
+                .score-9 { background-color: #d4edda; border-left: 5px solid #28a745; }
+                .score-8 { background-color: #d1ecf1; border-left: 5px solid #17a2b8; }
+                .score-7 { background-color: #fff3cd; border-left: 5px solid #ffc107; }
+                .metric { margin: 5px 0; }
+                .pass { color: green; font-weight: bold; }
+                .fail { color: #999; }
+            </style>
+        </head>
+        <body>
+            <h1>📊 Full F-Score (9/9) 주식 분석 리포트</h1>
+
+            <div class="summary">
+                <p><strong>날짜:</strong> 2025년 11월 09일</p>
+                <p><strong>분석 종목 수:</strong> 26개</p>
+                <p><strong>처리 시간:</strong> 병렬 처리 (고속) + OpenDart 공식 데이터</p>
+            </div>
+
+            <h2>🎯 상위 30개 추천 종목</h2>
+        
+            <div class="stock score-9">
+                <h3>1. SPC삼립 (005610) - 9/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 3/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-8">
+                <h3>2. 쇼박스 (086980) - 8/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-8">
+                <h3>3. SK하이닉스 (000660) - 8/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-8">
+                <h3>4. 서희건설 (035890) - 8/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-8">
+                <h3>5. SK스퀘어 (402340) - 8/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 3/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-8">
+                <h3>6. 동원금속 (018500) - 8/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-8">
+                <h3>7. 일정실업 (008500) - 8/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-8">
+                <h3>8. 캐프 (198080) - 8/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>9. 유아이엘 (049520) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>10. 싸이버원 (356890) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>11. 현대에이치티 (039010) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>12. 인피니트헬스케어 (071200) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>13. 국보디자인 (066620) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>14. 아이디피 (332370) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>15. 메가스터디교육 (215200) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 2/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>16. 한양디지텍 (078350) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>17. 디젠스 (113810) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric fail">
+                    ❌ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-7">
+                <h3>18. 한국전력 (015760) - 7/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>19. 전진바이오팜 (110020) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric fail">
+                    ❌ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric fail">
+                    ❌ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>20. 현대코퍼레이션홀딩스 (227840) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric fail">
+                    ❌ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>21. 에이텍모빌리티 (224110) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric fail">
+                    ❌ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>22. 영화테크 (265560) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>23. 셀레믹스 (331920) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric fail">
+                    ❌ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric pass">
+                    ✅ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>24. 제이엔케이글로벌 (126880) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 5/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric fail">
+                    ❌ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 1/3</strong></p>
+                <div class="metric pass">
+                    ✅ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>25. 지역난방공사 (071320) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 0/3</strong></p>
+                <div class="metric fail">
+                    ❌ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <div class="stock score-6">
+                <h3>26. 일동홀딩스 (000230) - 6/9점</h3>
+
+                <p><strong>📊 Lite F-Score (6개 지표): 6/6</strong></p>
+                <div class="metric pass">
+                    ✅ 당기순이익 > 0
+                </div>
+                <div class="metric pass">
+                    ✅ ROA 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 부채비율 감소
+                </div>
+                <div class="metric pass">
+                    ✅ 발행주식수 불변/감소
+                </div>
+                <div class="metric pass">
+                    ✅ 영업이익률 증가
+                </div>
+                <div class="metric pass">
+                    ✅ 자산회전율 증가
+                </div>
+
+                <p><strong>📈 OpenDart 추가 (3개 지표): 0/3</strong></p>
+                <div class="metric fail">
+                    ❌ 영업현금흐름 > 0
+                </div>
+                <div class="metric fail">
+                    ❌ 영업CF > 당기순이익
+                </div>
+                <div class="metric fail">
+                    ❌ 유동비율 증가
+                </div>
+            </div>
+            
+            <hr>
+            <p><em>본 리포트는 Full F-Score 전략(9/9 지표)을 기반으로 자동 생성되었습니다. 투자 판단의 참고자료로만 활용하시기 바랍니다.</em></p>
+        </body>
+        </html>
+        

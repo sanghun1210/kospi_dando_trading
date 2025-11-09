@@ -23,9 +23,9 @@ from fundametal_analysis import FundamentalAnalysis
 class LiteFScoreCalculator:
     """Lite F-Score 계산기 (FnGuide 데이터 활용)"""
 
-    def __init__(self, ticker):
+    def __init__(self, ticker, opendart_client=None):
         self.ticker = ticker
-        self.fa = FundamentalAnalysis(ticker)
+        self.fa = FundamentalAnalysis(ticker, opendart_client=opendart_client)
         self.score = 0
         self.details = {}
         self.last_error = None

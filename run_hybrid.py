@@ -38,6 +38,12 @@ def parse_args():
         help="Lite 단계 최대 처리 종목 수 (테스트용)",
     )
     parser.add_argument(
+        "--lite-workers",
+        type=int,
+        default=6,
+        help="Lite 단계 병렬 워커 수 (FnGuide 차단 방지용)",
+    )
+    parser.add_argument(
         "--test",
         action="store_true",
         help="빠른 검증을 위한 테스트 모드 (Lite 100개, Full 30개)",
@@ -56,12 +62,18 @@ def main():
 
     if args.test:
         print("⚠️  테스트 모드 실행 (Lite 100개 / Full 30개 / 최종 6점 이상)")
-        system.run(top_n=30, final_min_score=6, lite_max_count=100)
+        system.run(
+            top_n=30,
+            final_min_score=6,
+            lite_max_count=100,
+            lite_workers=args.lite_workers,
+        )
     else:
         system.run(
             top_n=args.top_n,
             final_min_score=args.final_min_score,
             lite_max_count=args.lite_max_count,
+            lite_workers=args.lite_workers,
         )
 
 

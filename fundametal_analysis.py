@@ -1,11 +1,15 @@
 from datetime import datetime, timedelta
-import pandas as pd
-
-from urllib.request import urlopen, Request
-from bs4 import BeautifulSoup
-import requests
 import math
+import random
+import time
 from io import StringIO
+from urllib.request import urlopen, Request
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # 재무 분석에 사용할 주요 지표 3개
 # 부채비율 (Debt to Equity Ratio): 기업이 자산 구매를 위해 얼마나 많은 부채를 사용하고 있는지를 나타냅니다. 
@@ -24,7 +28,15 @@ from io import StringIO
 
 
 class FundamentalAnalysis(object):
-    def __init__(self, ticker):
+    DART_FALLBACK_CONFIG = {
+        "당기순이익": {"statement": "IS", "keywords": ["당기순이익", "당기순이익(손실)"]},
+        "자산총계": {"statement": "BS", "keywords": ["자산총계"]},
+        "부채총계": {"statement": "BS", "keywords": ["부채총계"]},
+        "매출액": {"statement": "IS", "keywords": ["매출액", "수익(매출액)"]},
+        "영업이익": {"statement": "IS", "keywords": ["영업이익"]},
+    }
+
+    def __init__(self, ticker, opendart_client=None):
         self.current_eps = 0
         self.current_per = 0
         self.current_bps = 0
@@ -36,15 +48,47 @@ class FundamentalAnalysis(object):
         self.df = None
         self.table_token = None
         self.soup = None
-        self.get_data_from_fnguide(ticker)
+        self.ticker = str(ticker).zfill(6)
+        self.opendart_client = opendart_client
+        self._dart_sections = None
+        self._dart_loaded = False
+        self.session = self._create_session()
+        self.get_data_from_fnguide(self.ticker)
+
+    def _create_session(self):
+        """FnGuide 요청용 세션 (재시도 & 백오프 포함)."""
+        retry = Retry(
+            total=3,
+            connect=3,
+            read=3,
+            backoff_factor=0.5,
+            status_forcelist=(429, 500, 502, 503, 504),
+            allowed_methods=["GET"],
+        )
+        adapter = HTTPAdapter(max_retries=retry)
+        session = requests.Session()
+        session.mount("https://", adapter)
+        session.mount("http://", adapter)
+        return session
     
 
     def get_data_from_fnguide(self, ticker):
         try:
-            url = f'https://comp.fnguide.com/SVO2/ASP/SVD_Main.asp?pGB=1&gicode=A{ticker}&cID=&MenuYn=Y&ReportGB=&NewMenuID=11&stkGb=701'
-                    #req.add_header('User-Agent', 'Mozilla/5.0')
-            headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-            res = requests.get(url, headers=headers)
+            url = (
+                "https://comp.fnguide.com/SVO2/ASP/SVD_Main.asp"
+                f"?pGB=1&gicode=A{ticker}&cID=&MenuYn=Y&ReportGB=&NewMenuID=11&stkGb=701"
+            )
+            headers = {
+                'User-Agent': (
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) '
+                    'AppleWebKit/537.36 (KHTML, like Gecko) '
+                    'Chrome/39.0.2171.95 Safari/537.36'
+                )
+            }
+
+            time.sleep(random.uniform(0.05, 0.15))
+            res = self.session.get(url, headers=headers, timeout=5)
+            res.raise_for_status()
             self.soup = BeautifulSoup(res.text, 'html.parser')
 
             cop = self.soup.select_one('#highlight_D_A')
@@ -73,38 +117,122 @@ class FundamentalAnalysis(object):
             return None
 
     def get_data_lst_by(self, target_cloumn, target_row):
+        """지정된 행/열에서 수치 리스트 추출. 데이터가 없으면 빈 리스트 반환."""
+        if self.table_token is None or self.df is None:
+            return self._fallback_with_opendart(target_cloumn, target_row)
+
         try:
-            if self.table_token == None:
-                return None
             field_names = self.df[self.table_token]
-            df = self.df.loc[field_names[self.table_token]==target_row]
-            # print(df)
-            
+            df = self.df.loc[field_names[self.table_token] == target_row]
+
+            if df.empty:
+                return []
+
             data = df[target_cloumn]
+            if data.empty:
+                return []
 
-            # 특정 열에서 추정치 제거
-            # data = data[[col for col in data.columns if '(' not in col]]
-
-            #특정 열에서 결측값 제거
             filtered_data = data.dropna(axis=1)
+            if filtered_data.empty:
+                return []
+
             filtered_list = []
-            for x in filtered_data.iloc[0].tolist():
+            row_values = filtered_data.iloc[0].tolist()
+            for x in row_values:
                 converted_x = self.safe_float_convert(x)
-                if converted_x != None:
+                if converted_x is not None:
                     filtered_list.append(converted_x)
-            return filtered_list
-        except Exception as e:
-            print("Error : ", e)   
-            return None
+
+            if len(filtered_list) >= 2 or target_cloumn != "Annual":
+                return filtered_list
+
+            fallback = self._fallback_with_opendart(target_cloumn, target_row)
+            return fallback if fallback else filtered_list
+        except Exception:
+            return self._fallback_with_opendart(target_cloumn, target_row)
 
     # 업종에서 정보 가져오기    
     def get_biz_category_won(self, row, column):
         cop = self.soup.select_one('#upTabDivD')
-        df = pd.read_html(StringIO(cop.prettify()))[0]
+        if cop is None:
+            return None
 
+        df = pd.read_html(StringIO(cop.prettify()))[0]
         table_token = df.columns[0]
-        eps_df = df.loc[df[table_token ]==row]
+        eps_df = df.loc[df[table_token] == row]
+
+        if eps_df.empty or column >= eps_df.shape[1]:
+            return None
+
         return eps_df.iloc[0, column]
+
+    def _load_dart_sections(self):
+        sections = {}
+        if self.opendart_client is None:
+            return sections
+
+        corp_code = self.opendart_client.get_company_code(self.ticker)
+        if not corp_code:
+            return sections
+
+        year = str(datetime.now().year - 1)
+        df = self.opendart_client.get_financial_statements(corp_code, year, '11011')
+
+        if df is None or len(df) == 0:
+            return sections
+
+        df['__normalized_account__'] = df['account_nm'].str.replace(' ', '')
+
+        for div, group in df.groupby('sj_div'):
+            sections[div] = group.copy()
+
+        return sections
+
+    def _get_dart_section(self, statement):
+        if not self._dart_loaded:
+            self._dart_sections = self._load_dart_sections()
+            self._dart_loaded = True
+
+        if not self._dart_sections:
+            return None
+
+        return self._dart_sections.get(statement)
+
+    def _parse_dart_number(self, value):
+        try:
+            if value in (None, '', '-'):
+                return None
+            return float(str(value).replace(',', ''))
+        except Exception:
+            return None
+
+    def _fallback_with_opendart(self, target_column, target_row):
+        if target_column != "Annual":
+            return []
+
+        config = self.DART_FALLBACK_CONFIG.get(target_row)
+        if config is None:
+            return []
+
+        section = self._get_dart_section(config['statement'])
+        if section is None or len(section) == 0:
+            return []
+
+        normalized_keywords = [kw.replace(' ', '') for kw in config['keywords']]
+        normalized_col = '__normalized_account__'
+        rows = section[section[normalized_col].isin(normalized_keywords)]
+
+        if rows.empty:
+            return []
+
+        row = rows.iloc[0]
+        current = self._parse_dart_number(row.get('thstrm_amount'))
+        previous = self._parse_dart_number(row.get('frmtrm_amount'))
+
+        if current is None or previous is None:
+            return []
+
+        return [previous, current]
     
     # 종합 점수 계산 함수
     def calculate_weighted_score(self, data, weights):
