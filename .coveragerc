@@ -1,0 +1,54 @@
+# Coverage.py 설정 파일
+
+[run]
+# 소스 디렉토리
+source = .
+
+# 제외할 파일/디렉토리
+omit =
+    */tests/*
+    */test_*
+    */__pycache__/*
+    */venv/*
+    */.venv/*
+    */env/*
+    setup.py
+    */site-packages/*
+    */dist-packages/*
+    backtest_*.py
+    debug_*.py
+    main.py
+    fscore_main.py
+    run_*.py
+    analyze_results.py
+    rank_tickers.py
+
+[report]
+# 리포트 정밀도
+precision = 2
+
+# 누락 라인 표시
+show_missing = True
+
+# 제외할 라인 패턴
+exclude_lines =
+    # 기본 제외
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+
+    # 디버그 관련
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+
+    # 추상 메서드
+    @abstract
+
+    # 타입 체크
+    if 0:
+    if False:
+
+[html]
+# HTML 리포트 디렉토리
+directory = htmlcov
