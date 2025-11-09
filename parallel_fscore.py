@@ -18,16 +18,16 @@ from threading import Lock
 class ParallelFScoreSelector:
     """병렬 처리 F-Score 계산기"""
 
-    def __init__(self, use_existing_data=False, max_workers=15):
+    def __init__(self, use_existing_data=False, max_workers=8):
         """
         Parameters:
         -----------
         use_existing_data : bool
             기존 df_sorted.csv 사용 여부
         max_workers : int
-            동시 처리 스레드 수 (기본값: 15)
-            - 너무 많으면 API 차단 위험
-            - 15개가 최적 (속도 vs 안정성)
+            동시 처리 스레드 수 (기본값: 8)
+            - 너무 많으면 FnGuide가 차단할 수 있음
+            - 네트워크 품질에 따라 조정 가능
         """
         self.use_existing_data = use_existing_data
         self.max_workers = max_workers
@@ -84,13 +84,16 @@ class ParallelFScoreSelector:
 
                 return result
             else:
+                reason = getattr(calculator, 'last_error', '데이터 부족')
                 with self.lock:
                     self.fail_count += 1
+                print(f"[FAIL] {code} {name}: {reason}")
                 return None
 
         except Exception as e:
             with self.lock:
                 self.fail_count += 1
+            print(f"[ERROR] {code} {name}: {e}")
             return None
 
     def calculate_fscores_parallel(self, ticker_list, max_count=None):
@@ -326,7 +329,7 @@ def main():
     print("="*60)
 
     # 1. 초기화 (동시 15개 처리)
-    selector = ParallelFScoreSelector(use_existing_data=True, max_workers=15)
+    selector = ParallelFScoreSelector(use_existing_data=True, max_workers=8)
 
     # 2. 종목 리스트 가져오기
     ticker_list = selector.get_ticker_list()

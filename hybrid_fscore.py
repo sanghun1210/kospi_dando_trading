@@ -12,6 +12,7 @@ import pandas as pd
 from datetime import datetime
 from parallel_fscore import ParallelFScoreSelector
 from parallel_fscore_full import ParallelFullFScoreSelector
+from sector_utils import DEFAULT_SECTOR, get_sector_lookup
 
 
 class HybridFScoreSystem:
@@ -59,7 +60,7 @@ class HybridFScoreSystem:
 
         lite_selector = ParallelFScoreSelector(
             use_existing_data=True,
-            max_workers=15
+            max_workers=8
         )
 
         # 종목 리스트 가져오기
@@ -72,9 +73,14 @@ class HybridFScoreSystem:
             print("⚠️  Lite F-Score 결과가 없습니다.")
             return None
 
-        # 상위 N개 선정
         df_lite = pd.DataFrame(lite_results)
-        df_lite_ranked = df_lite.sort_values('score', ascending=False).reset_index(drop=True)
+        df_lite = self._apply_sector_adjustments(df_lite)
+
+        sort_columns = ['score']
+        if 'adjusted_score' in df_lite.columns:
+            sort_columns = ['adjusted_score', 'score']
+
+        df_lite_ranked = df_lite.sort_values(sort_columns, ascending=False).reset_index(drop=True)
 
         print(f"\n📊 Lite F-Score 결과:")
         print(f"  - 총 분석: {len(df_lite)}개")
@@ -90,6 +96,7 @@ class HybridFScoreSystem:
         df_top = df_lite_ranked.head(top_n).copy()
         top_codes = df_top['code'].tolist()
         top_names = df_top['name'].tolist()
+        sector_meta = df_top.set_index('code')[['sector', 'sector_relative_strength', 'adjusted_score']].to_dict('index')
 
         print(f"\n  ✅ 상위 {len(df_top)}개 종목 선정")
         print(f"     (점수 범위: {df_top['score'].min()}~{df_top['score'].max()}점)")
@@ -122,7 +129,11 @@ class HybridFScoreSystem:
 
         # 최종 결과
         df_full = pd.DataFrame(full_results)
-        df_full_ranked = df_full.sort_values('score', ascending=False).reset_index(drop=True)
+        df_full = self._attach_sector_context(df_full, sector_meta)
+        df_full_ranked = df_full.sort_values(
+            ['score', 'sector_relative_strength'],
+            ascending=False
+        ).reset_index(drop=True)
 
         print(f"\n📊 Full F-Score 결과:")
         print(f"  - 총 분석: {len(df_full)}개")
@@ -137,6 +148,12 @@ class HybridFScoreSystem:
         # 최종 필터링
         df_final = df_full_ranked[df_full_ranked['score'] >= final_min_score].copy()
         print(f"\n  ✅ {final_min_score}점 이상: {len(df_final)}개")
+
+        if 'sector' in df_final.columns:
+            sector_counts = df_final['sector'].value_counts().head(10)
+            print("\n  📌 섹터 상위 분포:")
+            for sector, count in sector_counts.items():
+                print(f"    - {sector}: {count}개")
 
         # Full 결과 저장
         full_filename = f'hybrid_full_results_{today}.csv'
@@ -158,7 +175,10 @@ class HybridFScoreSystem:
             lite_score = row['details'].get('lite_score', 0)
             additional_score = row['details'].get('additional_score', 0)
             print(f"{idx+1}. {row['name']} ({row['code']})")
+            sector_str = row.get('sector', DEFAULT_SECTOR)
+            srs = row.get('sector_relative_strength', 0.0)
             print(f"   Full: {row['score']}/9 ⭐ (Lite: {lite_score}/6 + OpenDart: {additional_score}/3)")
+            print(f"   Sector: {sector_str} | 상대강도 +{srs:.2f}")
 
         print(f"{'='*60}\n")
 
@@ -166,6 +186,78 @@ class HybridFScoreSystem:
         full_selector.generate_email_report(df_final, top_n=30)
 
         return df_final
+
+    def _apply_sector_adjustments(self, df_lite: pd.DataFrame) -> pd.DataFrame:
+        """섹터별 기준선을 반영해 Lite 단계 점수를 보정한다."""
+        if df_lite.empty:
+            return df_lite
+
+        df = df_lite.copy()
+
+        try:
+            sector_lookup = get_sector_lookup()
+        except Exception:
+            sector_lookup = {}
+
+        df['sector'] = df['code'].astype(str).str.zfill(6).map(sector_lookup).fillna(DEFAULT_SECTOR)
+
+        metric_defs = [
+            ('roa_current', True),
+            ('operating_margin_current', True),
+            ('asset_turnover_current', True),
+            ('debt_ratio_current', False),
+        ]
+
+        for metric_key, _ in metric_defs:
+            df[metric_key] = df['details'].apply(
+                lambda detail: detail.get(metric_key) if isinstance(detail, dict) else None
+            )
+
+        bonus_cols = []
+        for metric_key, higher_better in metric_defs:
+            sector_median = df.groupby('sector')[metric_key].transform('median')
+            if higher_better:
+                beats = df[metric_key] > sector_median
+            else:
+                beats = df[metric_key] < sector_median
+
+            col_name = f"{metric_key}_beats_sector"
+            df[col_name] = beats
+            bonus_cols.append(col_name)
+
+        if bonus_cols:
+            bonus_frame = df[bonus_cols].astype(float)
+            df['sector_relative_strength'] = bonus_frame.mean(axis=1, skipna=True).fillna(0.0)
+            df['adjusted_score'] = df['score'] + df['sector_relative_strength']
+        else:
+            df['sector_relative_strength'] = 0.0
+            df['adjusted_score'] = df['score']
+
+        unique_sectors = df['sector'].nunique()
+        print(f"\n📌 섹터 상대평가 적용 완료 ({unique_sectors}개 섹터)")
+
+        return df
+
+    def _attach_sector_context(self, df_full: pd.DataFrame, sector_meta):
+        """Full 단계 결과에 Lite 단계 섹터 정보를 병합한다."""
+        if df_full.empty:
+            return df_full
+
+        if not sector_meta:
+            df_full['sector'] = DEFAULT_SECTOR
+            df_full['sector_relative_strength'] = 0.0
+            df_full['lite_adjusted_score'] = None
+            return df_full
+
+        df_full['sector'] = df_full['code'].map(lambda c: sector_meta.get(c, {}).get('sector', DEFAULT_SECTOR))
+        df_full['sector_relative_strength'] = df_full['code'].map(
+            lambda c: sector_meta.get(c, {}).get('sector_relative_strength', 0.0)
+        ).fillna(0.0)
+        df_full['lite_adjusted_score'] = df_full['code'].map(
+            lambda c: sector_meta.get(c, {}).get('adjusted_score')
+        )
+
+        return df_full
 
 
 def main(test_mode=True):

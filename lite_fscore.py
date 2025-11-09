@@ -28,6 +28,7 @@ class LiteFScoreCalculator:
         self.fa = FundamentalAnalysis(ticker)
         self.score = 0
         self.details = {}
+        self.last_error = None
 
     def calculate(self):
         """
@@ -38,6 +39,7 @@ class LiteFScoreCalculator:
             details: dict (각 항목별 결과)
         """
         try:
+            self.last_error = None
             # 필요한 데이터 수집
             net_income = self.fa.get_data_lst_by("Annual", "당기순이익")
             total_assets = self.fa.get_data_lst_by("Annual", "자산총계")
@@ -49,10 +51,12 @@ class LiteFScoreCalculator:
             # 데이터 검증
             if not self._validate_data([net_income, total_assets, total_debt,
                                        shares, revenue, operating_income]):
+                self.last_error = "필수 재무 데이터 부족"
                 return None, None
 
             # 최소 2년 데이터 필요
             if len(net_income) < 2:
+                self.last_error = "연속 연도 데이터 부족"
                 return None, None
 
             # 각 항목 계산
@@ -80,6 +84,7 @@ class LiteFScoreCalculator:
             return self.score, self.details
 
         except Exception as e:
+            self.last_error = f"예외 발생: {e}"
             print(f"Error calculating Lite F-Score for {self.ticker}: {e}")
             return None, None
 
