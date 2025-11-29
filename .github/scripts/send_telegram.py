@@ -36,10 +36,17 @@ def format_morning_message(market_score, verdict, golden_cross):
 
     date = datetime.now().strftime('%Y-%m-%d')
 
+    # 시장 점수 변환 (빈 문자열 또는 None 처리)
+    try:
+        score = int(market_score) if market_score and market_score != '' else 0
+    except (ValueError, TypeError):
+        score = 0
+        market_score = "0"
+
     # 이모지 선택
-    if int(market_score) >= 2:
+    if score >= 2:
         emoji = "🟢"
-    elif int(market_score) >= 0:
+    elif score >= 0:
         emoji = "🟡"
     else:
         emoji = "🔴"
@@ -55,8 +62,7 @@ def format_morning_message(market_score, verdict, golden_cross):
     if golden_cross:
         message += f"\n{golden_cross}\n"
 
-    # 매수 전략
-    score = int(market_score)
+    # 매수 전략 (score는 위에서 이미 계산됨)
     if score >= 2:
         message += """
 💰 *오늘 매수 전략*
@@ -86,9 +92,15 @@ def format_evening_message(market_score, should_run, total_stocks, run_url):
 
     date = datetime.now().strftime('%Y-%m-%d')
 
+    # 시장 점수 변환 (빈 문자열 또는 None 처리)
+    try:
+        score = int(market_score) if market_score and market_score != '' else 0
+    except (ValueError, TypeError):
+        score = 0
+        market_score = "0"
+
     if should_run == 'true':
         # 분석 완료
-        score = int(market_score)
         if score >= 2:
             emoji = "🟢"
             strategy = "적극 매수 가능"
