@@ -1,5 +1,0 @@
-pandas
-bs4
-finance-datareader
-plotly
-pykrx

@@ -164,8 +164,12 @@ cython_debug/
 # Project-specific: Analysis results
 *_results_*.csv
 *_report_*.html
+*_checkpoint_*.csv
 df_sorted.csv
 tickers.csv
+
+# Analysis images (optional - comment out if needed for docs)
+fscore_*.png
 
 # Test coverage
 htmlcov/
