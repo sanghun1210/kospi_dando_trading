@@ -12,6 +12,10 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   full-analysis:
     runs-on: ubuntu-latest
