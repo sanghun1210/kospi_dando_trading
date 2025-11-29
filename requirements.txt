@@ -1,4 +1,5 @@
 # 핵심 의존성
+setuptools>=65.0.0
 pandas>=2.0.0
 numpy>=1.24.0
 requests>=2.31.0
