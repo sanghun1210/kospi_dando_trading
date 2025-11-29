@@ -1,0 +1,117 @@
+name: 🌅 Morning Market Check
+
+on:
+  schedule:
+    # 평일 오전 7:50 KST (UTC 22:50 전날)
+    - cron: '50 22 * * 0-4'
+
+  workflow_dispatch:  # 수동 실행
+
+jobs:
+  market-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: 📦 Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🌍 Check Market
+      id: market
+      run: |
+        echo "📊 시장 상황 분석 중..."
+        python market_filter.py > market_report.txt 2>&1 || true
+
+        # 시장 점수 추출
+        MARKET_SCORE=$(grep "시장 점수:" market_report.txt | grep -oP '\-?\d+' | head -1 || echo "0")
+        echo "market_score=$MARKET_SCORE" >> $GITHUB_OUTPUT
+
+        # 시장 상태
+        if grep -q "강한 상승\|적극 매수" market_report.txt; then
+          VERDICT="🟢 매수 적극 추천"
+        elif grep -q "선별 매수\|약한 상승" market_report.txt; then
+          VERDICT="🟡 선별 매수"
+        elif grep -q "관망\|하락" market_report.txt; then
+          VERDICT="🔴 매수 대기 권장"
+        else
+          VERDICT="⚪ 중립"
+        fi
+        echo "verdict=$VERDICT" >> $GITHUB_OUTPUT
+
+        # 골든크로스 체크
+        if grep -q "골든크로스" market_report.txt; then
+          echo "golden_cross=✨ 골든크로스 발생!" >> $GITHUB_OUTPUT
+        else
+          echo "golden_cross=" >> $GITHUB_OUTPUT
+        fi
+
+        cat market_report.txt
+      env:
+        OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+
+    - name: 📊 Summary
+      run: |
+        echo "## 🌅 아침 시장 체크 ($(date +%Y-%m-%d))" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 시장 점수: **${{ steps.market.outputs.market_score }}/3**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 판정: ${{ steps.market.outputs.verdict }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ -n "${{ steps.market.outputs.golden_cross }}" ]; then
+          echo "### ${{ steps.market.outputs.golden_cross }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "💡 **오늘 매수 전략:**" >> $GITHUB_STEP_SUMMARY
+
+        SCORE=${{ steps.market.outputs.market_score }}
+        if [ "$SCORE" -ge 2 ]; then
+          echo "- ✅ 적극 매수 가능" >> $GITHUB_STEP_SUMMARY
+          echo "- 어제 저녁 분석 결과 상위 종목 매수" >> $GITHUB_STEP_SUMMARY
+        elif [ "$SCORE" -ge 0 ]; then
+          echo "- ⚠️ 신중하게 선별 매수" >> $GITHUB_STEP_SUMMARY
+          echo "- 고득점 종목 중심으로 소량 매수" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- 🛑 매수 대기 권장" >> $GITHUB_STEP_SUMMARY
+          echo "- 현금 보유 또는 방어주만 고려" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📌 상세 분석은 [저녁 6시 결과](https://github.com/${{ github.repository }}/issues?q=is%3Aissue+label%3Astock-analysis)를 참고하세요" >> $GITHUB_STEP_SUMMARY
+
+    - name: 💾 Upload Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: morning-check-${{ github.run_number }}
+        path: market_report.txt
+        retention-days: 7
+
+    - name: 📱 Send Telegram Alert
+      if: always()
+      run: |
+        if [ -f ".github/scripts/send_telegram.py" ]; then
+          python .github/scripts/send_telegram.py \
+            --token "${{ secrets.TELEGRAM_BOT_TOKEN }}" \
+            --chat-id "${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --type "morning" \
+            --market-score "${{ steps.market.outputs.market_score }}" \
+            --verdict "${{ steps.market.outputs.verdict }}" \
+            --golden-cross "${{ steps.market.outputs.golden_cross }}"
+        else
+          echo "⚠️ 텔레그램 스크립트가 없습니다"
+        fi
+      continue-on-error: true

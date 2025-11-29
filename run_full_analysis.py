@@ -11,6 +11,7 @@ from datetime import datetime
 
 from hybrid_fscore import HybridFScoreSystem
 from hybrid_fscore_timing import HybridFScoreTiming
+from market_filter import MarketFilter
 
 
 def parse_args():
@@ -81,6 +82,24 @@ def parse_args():
         "--fscore-only",
         action="store_true",
         help="F-Score만 계산하고 타이밍 분석 생략",
+    )
+
+    # 시장 필터 설정
+    parser.add_argument(
+        "--skip-market-filter",
+        action="store_true",
+        help="시장 필터 생략 (비추천: 시장 하락장에도 분석 진행)",
+    )
+    parser.add_argument(
+        "--min-market-score",
+        type=int,
+        default=0,
+        help="최소 시장 점수 (-3~3, 기본: 0=중립 이상)",
+    )
+    parser.add_argument(
+        "--force-run",
+        action="store_true",
+        help="시장 약세여도 강제 실행 (경고만 표시)",
     )
 
     return parser.parse_args()
@@ -257,6 +276,83 @@ def run_timing_analysis(
     return results_df
 
 
+def check_market_condition(min_market_score=0, force_run=False):
+    """
+    시장 상황 체크 및 거래 허용 판단
+
+    Parameters:
+    -----------
+    min_market_score : int
+        최소 요구 시장 점수
+    force_run : bool
+        강제 실행 여부 (True면 경고만 표시)
+
+    Returns:
+    --------
+    allowed : bool
+        거래 허용 여부
+    strategy : dict
+        시장 전략
+    """
+    print("\n" + "=" * 80)
+    print("🌍 시장 상황 분석")
+    print("=" * 80)
+
+    # KOSPI 체크
+    try:
+        kospi_filter = MarketFilter('1001')
+        kospi_filter.load_data()
+        strategy = kospi_filter.print_report()
+
+        market_score = kospi_filter.score
+        allowed, reason = kospi_filter.should_trade(min_market_score)
+
+        # KOSDAQ도 참고용으로 출력
+        print("\n" + "=" * 80)
+        print("📊 KOSDAQ 참고 (보조 지표)")
+        print("=" * 80)
+
+        kosdaq_filter = MarketFilter('2001')
+        kosdaq_filter.load_data()
+        kosdaq_score, kosdaq_details = kosdaq_filter.calculate_market_score()
+
+        print(f"KOSDAQ 점수: {kosdaq_score}/3")
+        for detail in kosdaq_details:
+            print(f"  {detail}")
+
+        # 판단
+        print("\n" + "=" * 80)
+        print("⚖️  최종 판단")
+        print("=" * 80)
+
+        if allowed:
+            print(f"\n✅ {reason}")
+            print(f"   전략: {strategy['description']}")
+            return True, strategy
+        else:
+            print(f"\n⚠️  {reason}")
+            print(f"   현재 전략: {strategy['description']}")
+
+            if force_run:
+                print("\n🔴 강제 실행 모드 (--force-run)")
+                print("   ⚠️  위험: 시장 하락장에서 손실 가능성 높음")
+                print("   권장: 분석은 진행하되 실제 매수는 신중히 판단하세요")
+                return True, strategy
+            else:
+                print("\n💡 권장 조치:")
+                print("   1. 시장이 회복될 때까지 대기")
+                print("   2. 골든크로스 발생 시 재실행")
+                print("   3. 또는 --force-run 옵션으로 강제 실행")
+                print("\n   재실행 예시:")
+                print("   python run_full_analysis.py --skip-fscore --api-key YOUR_KEY")
+                return False, strategy
+
+    except Exception as e:
+        print(f"\n❌ 시장 데이터 로드 실패: {e}")
+        print("   시장 필터를 건너뛰고 계속 진행합니다")
+        return True, None
+
+
 def print_statistics(full_df, filtered_df):
     """분석 통계 출력"""
     print("\n" + "=" * 80)
@@ -296,6 +392,22 @@ def main():
 
     if args.test:
         print("\n⚠️  테스트 모드 활성화")
+
+    # 0단계: 시장 필터 체크 (선택적)
+    if not args.skip_market_filter:
+        allowed, market_strategy = check_market_condition(
+            min_market_score=args.min_market_score,
+            force_run=args.force_run
+        )
+
+        if not allowed:
+            print("\n🛑 시장 약세로 분석을 중단합니다")
+            print("   시장이 회복되면 다시 실행하세요")
+            sys.exit(0)
+    else:
+        print("\n⚠️  시장 필터 생략 (--skip-market-filter)")
+        print("   주의: 시장 하락장에서도 분석 진행")
+        market_strategy = None
 
     # 1단계: F-Score 분석
     if not args.skip_fscore:
@@ -347,7 +459,7 @@ def main():
     print("🎉 분석 완료!")
     print("=" * 80)
     print(f"\n결과 파일:")
-    print(f"  1. F-Score: {fscore_csv}")
+    print(f"  1. F-Score: {timing_csv}")
     print(f"  2. 통합: hybrid_timing_results_*.csv")
     print("\n다음 단계:")
     print("  1. CSV 파일을 열어서 상위 종목 확인")

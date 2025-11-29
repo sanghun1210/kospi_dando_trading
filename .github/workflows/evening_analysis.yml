@@ -1,0 +1,298 @@
+name: 🌙 Evening Full Analysis
+
+on:
+  schedule:
+    # 평일 오후 6시 KST (UTC 9시)
+    - cron: '0 9 * * 1-5'
+
+  workflow_dispatch:  # 수동 실행
+    inputs:
+      force_run:
+        description: '시장 약세여도 강제 실행'
+        type: boolean
+        default: false
+
+jobs:
+  full-analysis:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: 📦 Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🌍 Market Filter Check
+      id: market
+      run: |
+        echo "📊 시장 상황 분석 중..."
+        python market_filter.py > market_report.txt 2>&1 || true
+
+        MARKET_SCORE=$(grep "시장 점수:" market_report.txt | grep -oP '\-?\d+' | head -1 || echo "0")
+        echo "market_score=$MARKET_SCORE" >> $GITHUB_OUTPUT
+
+        # 시장 상태
+        MARKET_REGIME=$(grep "최종 판정" market_report.txt -A 2 | tail -1 | xargs || echo "unknown")
+        echo "market_regime=$MARKET_REGIME" >> $GITHUB_OUTPUT
+
+        cat market_report.txt
+      env:
+        OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+
+    - name: 🚦 Should Run Analysis?
+      id: should_run
+      run: |
+        MARKET_SCORE="${{ steps.market.outputs.market_score }}"
+        FORCE_RUN="${{ github.event.inputs.force_run }}"
+
+        if [ "$FORCE_RUN" = "true" ]; then
+          echo "🔴 강제 실행 모드"
+          echo "should_run=true" >> $GITHUB_OUTPUT
+          echo "reason=강제 실행" >> $GITHUB_OUTPUT
+        elif [ "$MARKET_SCORE" -ge 0 ]; then
+          echo "✅ 시장 조건 양호 (점수: $MARKET_SCORE)"
+          echo "should_run=true" >> $GITHUB_OUTPUT
+          echo "reason=시장 점수 $MARKET_SCORE/3" >> $GITHUB_OUTPUT
+        else
+          echo "🛑 시장 약세 (점수: $MARKET_SCORE)"
+          echo "should_run=false" >> $GITHUB_OUTPUT
+          echo "reason=시장 약세 ($MARKET_SCORE/3)" >> $GITHUB_OUTPUT
+        fi
+
+    - name: 📊 Run Full Analysis
+      if: steps.should_run.outputs.should_run == 'true'
+      run: |
+        echo "🚀 전체 분석 시작..."
+
+        FORCE_FLAG=""
+        if [ "${{ github.event.inputs.force_run }}" = "true" ]; then
+          FORCE_FLAG="--force-run"
+        fi
+
+        python run_full_analysis.py \
+          --api-key ${{ secrets.OPENDART_API_KEY }} \
+          --min-market-score 0 \
+          $FORCE_FLAG \
+          2>&1 | tee analysis_log.txt
+
+        echo "✅ 분석 완료"
+      env:
+        OPENDART_API_KEY: ${{ secrets.OPENDART_API_KEY }}
+      continue-on-error: true
+
+    - name: 📋 Extract Results
+      if: steps.should_run.outputs.should_run == 'true'
+      id: results
+      run: |
+        # 최신 결과 파일 찾기
+        TIMING_FILE=$(ls -t hybrid_timing_results_*.csv 2>/dev/null | head -1)
+        LITE_FILE=$(ls -t hybrid_lite_results_*.csv 2>/dev/null | head -1)
+        FULL_FILE=$(ls -t hybrid_full_results_*.csv 2>/dev/null | head -1)
+
+        if [ -n "$TIMING_FILE" ]; then
+          echo "✅ 타이밍 결과: $TIMING_FILE"
+          echo "timing_file=$TIMING_FILE" >> $GITHUB_OUTPUT
+
+          # 상위 10개 추출
+          head -11 "$TIMING_FILE" > top10_stocks.csv
+
+          # 통계
+          TOTAL=$(tail -n +2 "$TIMING_FILE" | wc -l)
+          echo "total_stocks=$TOTAL" >> $GITHUB_OUTPUT
+          echo "results_found=true" >> $GITHUB_OUTPUT
+        else
+          echo "⚠️ 결과 파일을 찾을 수 없습니다"
+          echo "results_found=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: 💾 Upload Artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: analysis-results-${{ github.run_number }}
+        path: |
+          hybrid_timing_results_*.csv
+          hybrid_lite_results_*.csv
+          hybrid_full_results_*.csv
+          top10_stocks.csv
+          market_report.txt
+          analysis_log.txt
+        retention-days: 90
+        if-no-files-found: ignore
+
+    - name: 📝 Create GitHub Issue
+      if: steps.should_run.outputs.should_run == 'true' && steps.results.outputs.results_found == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const date = new Date().toISOString().split('T')[0];
+
+          // 상위 10개 읽기
+          let top10Content = '';
+          if (fs.existsSync('top10_stocks.csv')) {
+            top10Content = fs.readFileSync('top10_stocks.csv', 'utf8');
+          }
+
+          // 시장 점수로 라벨 결정
+          const marketScore = ${{ steps.market.outputs.market_score }};
+          let scoreLabel = 'neutral';
+          if (marketScore >= 2) scoreLabel = 'bullish';
+          else if (marketScore >= 1) scoreLabel = 'slightly-bullish';
+          else if (marketScore <= -2) scoreLabel = 'bearish';
+          else if (marketScore <= -1) scoreLabel = 'slightly-bearish';
+
+          const issueBody = `
+          ## 📊 주식 분석 결과 - ${date}
+
+          ### 🌍 시장 상황
+          - **시장 점수**: ${{ steps.market.outputs.market_score }}/3
+          - **시장 상태**: ${{ steps.market.outputs.market_regime }}
+          - **분석 종목 수**: ${{ steps.results.outputs.total_stocks }}개
+
+          ### 🏆 상위 10개 추천 종목
+
+          \`\`\`csv
+          ${top10Content}
+          \`\`\`
+
+          ### 📥 전체 결과 다운로드
+
+          [Artifacts에서 다운로드](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          ### 💡 투자 전략
+
+          ${marketScore >= 2 ? '✅ **적극 매수 가능**\n- 상위 종목 중심으로 포트폴리오 구성\n- 분산 투자 권장 (10~20개)' :
+            marketScore >= 1 ? '🟡 **선별 매수**\n- 고득점 종목만 선별\n- 보수적 포트폴리오 (5~10개)' :
+            marketScore >= 0 ? '🟠 **신중한 매수**\n- 최고 득점 종목만 소량\n- 방어주 중심' :
+            '🔴 **관망 권장**\n- 매수 보류\n- 시장 회복 대기'}
+
+          ---
+
+          <details>
+          <summary>📊 시장 상세 분석</summary>
+
+          \`\`\`
+          ${fs.existsSync('market_report.txt') ?
+            fs.readFileSync('market_report.txt', 'utf8').split('\n').slice(0, 50).join('\n') :
+            '데이터 없음'}
+          \`\`\`
+
+          </details>
+
+          ---
+
+          **다음 분석**: 내일 오후 6시
+          **아침 체크**: 내일 오전 7:50
+          `;
+
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `📈 주식 분석 - ${date}`,
+            body: issueBody,
+            labels: ['stock-analysis', 'automated', scoreLabel]
+          });
+
+          console.log('✅ GitHub Issue 생성 완료');
+
+    - name: 📝 Create Issue for Market Skip
+      if: steps.should_run.outputs.should_run == 'false'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const date = new Date().toISOString().split('T')[0];
+
+          const issueBody = `
+          ## 🛑 시장 약세로 분석 생략 - ${date}
+
+          ### 🌍 시장 상황
+          - **시장 점수**: ${{ steps.market.outputs.market_score }}/3
+          - **판정**: ${{ steps.market.outputs.market_regime }}
+
+          ### 💡 권장 조치
+          - 매수 보류
+          - 시장 회복 대기
+          - 골든크로스 발생 시 자동으로 분석 재개
+
+          ### 📊 다음 체크
+          - 내일 오전 7:50 시장 필터
+          - 내일 오후 6:00 전체 분석 (조건 충족 시)
+
+          ---
+
+          <details>
+          <summary>시장 상세 분석</summary>
+
+          \`\`\`
+          ${require('fs').existsSync('market_report.txt') ?
+            require('fs').readFileSync('market_report.txt', 'utf8') :
+            '데이터 없음'}
+          \`\`\`
+
+          </details>
+          `;
+
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `⏸️ 분석 생략 - ${date}`,
+            body: issueBody,
+            labels: ['market-skip', 'automated']
+          });
+
+    - name: 📱 Send Telegram Notification
+      if: always()
+      run: |
+        if [ -f ".github/scripts/send_telegram.py" ]; then
+          python .github/scripts/send_telegram.py \
+            --token "${{ secrets.TELEGRAM_BOT_TOKEN }}" \
+            --chat-id "${{ secrets.TELEGRAM_CHAT_ID }}" \
+            --type "evening" \
+            --market-score "${{ steps.market.outputs.market_score }}" \
+            --should-run "${{ steps.should_run.outputs.should_run }}" \
+            --total-stocks "${{ steps.results.outputs.total_stocks }}" \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        else
+          echo "⚠️ 텔레그램 스크립트가 없습니다"
+        fi
+      continue-on-error: true
+
+    - name: ✅ Summary
+      if: always()
+      run: |
+        echo "## 🌙 저녁 전체 분석 ($(date +%Y-%m-%d))" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 시장 점수: **${{ steps.market.outputs.market_score }}/3**" >> $GITHUB_STEP_SUMMARY
+        echo "### 분석 실행: ${{ steps.should_run.outputs.should_run }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ "${{ steps.should_run.outputs.should_run }}" = "true" ]; then
+          echo "### ✅ 분석 완료" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 분석 종목: ${{ steps.results.outputs.total_stocks }}개" >> $GITHUB_STEP_SUMMARY
+          echo "- [결과 다운로드](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          echo "- [Issues에서 보기](https://github.com/${{ github.repository }}/issues?q=is%3Aissue+label%3Astock-analysis)" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### 🛑 시장 약세로 분석 생략" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**이유**: ${{ steps.should_run.outputs.reason }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "시장이 회복되면 자동으로 분석이 재개됩니다." >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "---" >> $GITHUB_STEP_SUMMARY
+        echo "📌 **다음 스케줄**" >> $GITHUB_STEP_SUMMARY
+        echo "- 내일 오전 7:50 - 시장 체크" >> $GITHUB_STEP_SUMMARY
+        echo "- 내일 오후 6:00 - 전체 분석" >> $GITHUB_STEP_SUMMARY

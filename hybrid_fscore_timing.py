@@ -13,6 +13,7 @@ import os
 from technical_data_collector import TechnicalDataCollector
 from technical_indicators import TechnicalIndicators
 from timing_signals import TimingSignals
+from market_filter import MarketFilter
 
 
 class HybridFScoreTiming:
@@ -213,6 +214,20 @@ class HybridFScoreTiming:
         total_original = len(stocks_to_analyze) + len(processed_tickers)
         total = len(stocks_to_analyze)
 
+        # 시장 점수 계산 (한 번만)
+        market_score = None
+        market_regime = None
+        try:
+            market_filter = MarketFilter('1001')  # KOSPI
+            market_filter.load_data()
+            market_score, _ = market_filter.calculate_market_score()
+            market_regime = market_filter.determine_regime()
+            print(f"📊 시장 상태: {market_score}/3 ({market_regime})")
+        except Exception as e:
+            print(f"⚠️  시장 점수 계산 실패: {e}")
+            market_score = 0
+            market_regime = 'unknown'
+
         print(f"\n🚀 통합 분석 시작")
         print(f"  전체: {total_original}개")
         if len(processed_tickers) > 0:
@@ -225,6 +240,12 @@ class HybridFScoreTiming:
         if total == 0:
             print(f"✅ 모든 종목 분석 완료 (체크포인트에서 복구)\n")
             results_df = pd.DataFrame(results)
+
+            # 시장 점수 추가
+            if market_score is not None:
+                results_df['Market_Score'] = market_score
+                results_df['Market_Regime'] = market_regime
+
             results_df = results_df.sort_values('Combined_Score', ascending=False)
             results_df = results_df.reset_index(drop=True)
             results_df.index = results_df.index + 1
@@ -274,6 +295,12 @@ class HybridFScoreTiming:
         # DataFrame 변환 및 정렬
         if len(results) > 0:
             results_df = pd.DataFrame(results)
+
+            # 시장 점수 추가
+            if market_score is not None:
+                results_df['Market_Score'] = market_score
+                results_df['Market_Regime'] = market_regime
+
             results_df = results_df.sort_values('Combined_Score', ascending=False)
             results_df = results_df.reset_index(drop=True)
             results_df.index = results_df.index + 1  # 1부터 시작
