@@ -15,7 +15,7 @@ html5lib>=1.1
 matplotlib>=3.7.0
 
 # 기술적 분석
-pandas-ta>=0.4.0
+pandas-ta>=0.4.67b0
 tqdm>=4.67.0
 
 # 테스트
